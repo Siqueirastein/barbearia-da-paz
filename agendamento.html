@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Agendamento • Barbearia Da Paz</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  min-height:100vh;
+  background:
+  linear-gradient(rgba(0,0,0,.78),rgba(0,0,0,.95)),
+  url("https://images.unsplash.com/photo-1517832606299-7ae9b720a186") center/cover;
+  color:white;
+  padding:24px;
+}
+
+.container{
+  max-width:520px;
+  margin:auto;
+}
+
+.logo{
+  width:120px;
+  height:120px;
+  margin:25px auto 18px;
+  border-radius:50%;
+  overflow:hidden;
+  border:2px solid #d08a3a;
+  background:#111;
+  box-shadow:0 0 35px rgba(208,138,58,.35);
+}
+
+.logo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+h1{
+  text-align:center;
+  margin-bottom:10px;
+}
+
+.subtitle{
+  text-align:center;
+  color:#ccc;
+  margin-bottom:24px;
+  line-height:1.5;
+}
+
+.card{
+  background:rgba(15,15,15,.95);
+  border:1px solid rgba(208,138,58,.28);
+  border-radius:28px;
+  padding:24px;
+}
+
+.input-group{
+  margin-bottom:16px;
+}
+
+label{
+  display:block;
+  margin-bottom:8px;
+  color:#d08a3a;
+  font-weight:bold;
+}
+
+input,
+select{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:16px;
+  background:#1e1e1e;
+  color:white;
+  font-size:15px;
+}
+
+.horarios{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:8px;
+}
+
+.horario{
+  padding:13px;
+  border:none;
+  border-radius:14px;
+  background:#222;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.horario.selecionado{
+  background:linear-gradient(135deg,#d08a3a,#8a4f1f);
+  color:#111;
+}
+
+.resumo{
+  background:#111;
+  border:1px solid rgba(208,138,58,.25);
+  border-radius:18px;
+  padding:16px;
+  margin:18px 0;
+}
+
+.resumo h3{
+  color:#d08a3a;
+  margin-bottom:10px;
+}
+
+.resumo p{
+  color:#ddd;
+  font-size:14px;
+  margin-bottom:6px;
+}
+
+.btn{
+  width:100%;
+  border:none;
+  padding:16px;
+  border-radius:16px;
+  background:linear-gradient(135deg,#d08a3a,#8a4f1f);
+  color:#111;
+  font-weight:bold;
+  font-size:16px;
+  cursor:pointer;
+  margin-top:10px;
+}
+
+.back{
+  display:block;
+  text-align:center;
+  margin-top:16px;
+  color:#aaa;
+  text-decoration:none;
+}
+
+@media(max-width:430px){
+  .horarios{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="logo">
+    <img src="assets/logo.png" alt="Logo Barbearia Da Paz">
+  </div>
+
+  <h1>Agendar horário</h1>
+
+  <p class="subtitle">
+    Escolha o serviço, barbeiro, data e horário.
+  </p>
+
+  <div class="card">
+
+    <div class="input-group">
+      <label>Seu nome</label>
+      <input type="text" id="nome" placeholder="Digite seu nome">
+    </div>
+
+    <div class="input-group">
+      <label>Telefone</label>
+      <input type="text" id="telefone" placeholder="Ex: 91999999999">
+    </div>
+
+    <div class="input-group">
+      <label>Serviço</label>
+      <select id="servico" onchange="atualizarResumo()">
+        <option value="Corte masculino">Corte masculino - R$ 35</option>
+        <option value="Barba completa">Barba completa - R$ 25</option>
+        <option value="Corte + Barba">Corte + Barba - R$ 55</option>
+        <option value="Plano VIP">Plano VIP - R$ 99</option>
+      </select>
+    </div>
+
+    <div class="input-group">
+      <label>Barbeiro</label>
+      <select id="barbeiro" onchange="atualizarResumo()">
+        <option>Felipe</option>
+        <option>Carlos</option>
+        <option>João</option>
+      </select>
+    </div>
+
+    <div class="input-group">
+      <label>Data</label>
+      <input type="date" id="data" onchange="atualizarResumo()">
+    </div>
+
+    <div class="input-group">
+      <label>Horários disponíveis</label>
+
+      <div class="horarios">
+        <button class="horario" onclick="selecionarHorario('09:00', this)">09:00</button>
+        <button class="horario" onclick="selecionarHorario('10:00', this)">10:00</button>
+        <button class="horario" onclick="selecionarHorario('11:00', this)">11:00</button>
+        <button class="horario" onclick="selecionarHorario('14:00', this)">14:00</button>
+        <button class="horario" onclick="selecionarHorario('15:00', this)">15:00</button>
+        <button class="horario" onclick="selecionarHorario('16:00', this)">16:00</button>
+      </div>
+    </div>
+
+    <div class="resumo">
+      <h3>Resumo</h3>
+      <p><strong>Serviço:</strong> <span id="resumoServico">Corte masculino</span></p>
+      <p><strong>Barbeiro:</strong> <span id="resumoBarbeiro">Felipe</span></p>
+      <p><strong>Data:</strong> <span id="resumoData">Não escolhida</span></p>
+      <p><strong>Horário:</strong> <span id="resumoHora">Não escolhido</span></p>
+      <p><strong>Valor:</strong> <span id="resumoValor">R$ 35</span></p>
+    </div>
+
+    <button class="btn" onclick="confirmarAgendamento()">
+      Confirmar pelo WhatsApp
+    </button>
+
+    <a href="index.html" class="back">
+      Voltar para o início
+    </a>
+
+  </div>
+
+</div>
+
+<script>
+let horarioSelecionado = "";
+
+function precoServico(servico){
+  if(servico === "Corte masculino") return 35;
+  if(servico === "Barba completa") return 25;
+  if(servico === "Corte + Barba") return 55;
+  if(servico === "Plano VIP") return 99;
+  return 0;
+}
+
+function selecionarHorario(hora, botao){
+  horarioSelecionado = hora;
+
+  document.querySelectorAll(".horario").forEach((btn) => {
+    btn.classList.remove("selecionado");
+  });
+
+  botao.classList.add("selecionado");
+
+  atualizarResumo();
+}
+
+function atualizarResumo(){
+  const servico = document.getElementById("servico").value;
+  const barbeiro = document.getElementById("barbeiro").value;
+  const data = document.getElementById("data").value;
+
+  document.getElementById("resumoServico").textContent = servico;
+  document.getElementById("resumoBarbeiro").textContent = barbeiro;
+  document.getElementById("resumoData").textContent = data || "Não escolhida";
+  document.getElementById("resumoHora").textContent = horarioSelecionado || "Não escolhido";
+  document.getElementById("resumoValor").textContent = "R$ " + precoServico(servico);
+}
+
+function confirmarAgendamento(){
+  const nome = document.getElementById("nome").value;
+  const telefone = document.getElementById("telefone").value;
+  const servico = document.getElementById("servico").value;
+  const barbeiro = document.getElementById("barbeiro").value;
+  const data = document.getElementById("data").value;
+
+  if(nome === "" || telefone === "" || data === "" || horarioSelecionado === ""){
+    alert("Preencha todos os campos e escolha um horário.");
+    return;
+  }
+
+  const agendamento = {
+    nome,
+    telefone,
+    servico,
+    barbeiro,
+    data,
+    hora: horarioSelecionado,
+    valor: precoServico(servico),
+    status: "Pendente"
+  };
+
+  const lista = JSON.parse(localStorage.getItem("agendamentos")) || [];
+  lista.push(agendamento);
+  localStorage.setItem("agendamentos", JSON.stringify(lista));
+
+  const mensagem =
+`Olá, gostaria de confirmar meu horário na Barbearia Da Paz.
+
+Nome: ${nome}
+Telefone: ${telefone}
+Serviço: ${servico}
+Barbeiro: ${barbeiro}
+Data: ${data}
+Horário: ${horarioSelecionado}
+Valor: R$ ${precoServico(servico)}`;
+
+  const numero = "5591982041321";
+  const link = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
+
+  window.open(link, "_blank");
+}
+
+atualizarResumo();
+</script>
+
+</body>
+</html>

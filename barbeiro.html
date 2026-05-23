@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Painel • Barbearia Da Paz</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  min-height:100vh;
+  background:
+    linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,.95)),
+    url("https://images.unsplash.com/photo-1585747860715-2ba37e788b70") center/cover;
+  color:white;
+  padding:24px;
+}
+
+.container{
+  max-width:900px;
+  margin:auto;
+}
+
+.logo{
+  width:120px;
+  height:120px;
+  margin:25px auto 18px;
+  border-radius:50%;
+  overflow:hidden;
+  border:2px solid #d08a3a;
+  background:#111;
+  box-shadow:0 0 35px rgba(208,138,58,.35);
+}
+
+.logo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+h1{
+  text-align:center;
+  margin-bottom:10px;
+}
+
+.subtitle{
+  text-align:center;
+  color:#ccc;
+  margin-bottom:24px;
+}
+
+.dashboard{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin-bottom:22px;
+}
+
+.card{
+  background:rgba(15,15,15,.95);
+  border:1px solid rgba(208,138,58,.28);
+  border-radius:22px;
+  padding:20px;
+  text-align:center;
+}
+
+.card h2{
+  color:#d08a3a;
+  font-size:30px;
+  margin-bottom:8px;
+}
+
+.card p{
+  color:#bbb;
+}
+
+.lista{
+  background:rgba(15,15,15,.95);
+  border:1px solid rgba(208,138,58,.28);
+  border-radius:26px;
+  padding:22px;
+}
+
+.lista h2{
+  color:#d08a3a;
+  text-align:center;
+  margin-bottom:18px;
+}
+
+.agendamento{
+  background:#1f1f1f;
+  border-left:5px solid #d08a3a;
+  padding:16px;
+  border-radius:16px;
+  margin-bottom:14px;
+}
+
+.agendamento p{
+  color:#ddd;
+  margin-bottom:7px;
+}
+
+.agendamento strong{
+  color:#d08a3a;
+}
+
+.status{
+  display:inline-block;
+  margin-top:8px;
+  padding:7px 12px;
+  border-radius:999px;
+  background:#4b3810;
+  color:#ffd15d;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.status.confirmado{
+  background:#103d24;
+  color:#72f59f;
+}
+
+.status.concluido{
+  background:#123a5a;
+  color:#7bc2ff;
+}
+
+.btns{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:14px;
+}
+
+button{
+  padding:12px;
+  border:none;
+  border-radius:13px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.confirmar{
+  background:linear-gradient(135deg,#d08a3a,#8a4f1f);
+  color:#111;
+}
+
+.concluir{
+  background:#123a5a;
+  color:white;
+}
+
+.excluir{
+  background:#741919;
+  color:white;
+}
+
+.back{
+  display:block;
+  text-align:center;
+  margin-top:18px;
+  padding:15px;
+  border-radius:16px;
+  background:#222;
+  color:white;
+  text-decoration:none;
+  font-weight:bold;
+}
+
+.sair{
+  width:100%;
+  margin-bottom:18px;
+  padding:14px;
+  border-radius:16px;
+  background:#222;
+  color:white;
+}
+
+.vazio{
+  text-align:center;
+  color:#aaa;
+  padding:20px;
+}
+
+@media(max-width:700px){
+  .dashboard,
+  .btns{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="logo">
+    <img src="assets/logo.png" alt="Logo Barbearia Da Paz">
+  </div>
+
+  <h1>Painel do barbeiro</h1>
+
+  <p class="subtitle">
+    Controle dos agendamentos da Barbearia Da Paz.
+  </p>
+
+  <button class="sair" onclick="sair()">
+    Sair da conta
+  </button>
+
+  <div class="dashboard">
+
+    <div class="card">
+      <h2 id="total">0</h2>
+      <p>Agendamentos</p>
+    </div>
+
+    <div class="card">
+      <h2 id="confirmados">0</h2>
+      <p>Confirmados</p>
+    </div>
+
+    <div class="card">
+      <h2 id="ganhos">R$ 0</h2>
+      <p>Ganhos concluídos</p>
+    </div>
+
+  </div>
+
+  <div class="lista">
+
+    <h2>Agenda</h2>
+
+    <div id="listaAgendamentos">
+      <p class="vazio">Carregando...</p>
+    </div>
+
+  </div>
+
+  <a href="index.html" class="back">
+    Voltar para o início
+  </a>
+
+</div>
+
+<script>
+function buscarAgendamentos(){
+  return JSON.parse(localStorage.getItem("agendamentos")) || [];
+}
+
+function salvarAgendamentos(lista){
+  localStorage.setItem("agendamentos", JSON.stringify(lista));
+}
+
+function renderizar(){
+  const lista = buscarAgendamentos();
+  const area = document.getElementById("listaAgendamentos");
+
+  area.innerHTML = "";
+
+  if(lista.length === 0){
+    area.innerHTML = `<p class="vazio">Nenhum agendamento encontrado.</p>`;
+  }
+
+  let total = lista.length;
+  let confirmados = 0;
+  let ganhos = 0;
+
+  lista.forEach((ag, index) => {
+    if(ag.status === "Confirmado"){
+      confirmados++;
+    }
+
+    if(ag.status === "Concluído"){
+      ganhos += Number(ag.valor);
+    }
+
+    const classeStatus =
+      ag.status === "Confirmado" ? "confirmado" :
+      ag.status === "Concluído" ? "concluido" : "";
+
+    area.innerHTML += `
+      <div class="agendamento">
+        <p><strong>Cliente:</strong> ${ag.nome}</p>
+        <p><strong>Telefone:</strong> ${ag.telefone}</p>
+        <p><strong>Serviço:</strong> ${ag.servico}</p>
+        <p><strong>Barbeiro:</strong> ${ag.barbeiro}</p>
+        <p><strong>Data:</strong> ${ag.data}</p>
+        <p><strong>Horário:</strong> ${ag.hora}</p>
+        <p><strong>Valor:</strong> R$ ${ag.valor}</p>
+
+        <span class="status ${classeStatus}">
+          ${ag.status}
+        </span>
+
+        <div class="btns">
+          <button class="confirmar" onclick="mudarStatus(${index}, 'Confirmado')">
+            Confirmar
+          </button>
+
+          <button class="concluir" onclick="mudarStatus(${index}, 'Concluído')">
+            Concluir
+          </button>
+
+          <button class="excluir" onclick="excluirAgendamento(${index})">
+            Excluir
+          </button>
+        </div>
+      </div>
+    `;
+  });
+
+  document.getElementById("total").textContent = total;
+  document.getElementById("confirmados").textContent = confirmados;
+  document.getElementById("ganhos").textContent = "R$ " + ganhos;
+}
+
+function mudarStatus(index, status){
+  const lista = buscarAgendamentos();
+  lista[index].status = status;
+  salvarAgendamentos(lista);
+  renderizar();
+}
+
+function excluirAgendamento(index){
+  const confirmar = confirm("Deseja excluir este agendamento?");
+
+  if(!confirmar){
+    return;
+  }
+
+  const lista = buscarAgendamentos();
+  lista.splice(index, 1);
+  salvarAgendamentos(lista);
+  renderizar();
+}
+
+function sair(){
+  window.location.href = "login.html";
+}
+
+renderizar();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Login • Barbearia Da Paz</title>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+body{
+
+  min-height:100vh;
+
+  background:
+  linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,.95)),
+  url("https://images.unsplash.com/photo-1503951914875-452162b0f3f1") center/cover;
+
+  color:white;
+
+  padding:24px;
+}
+
+.container{
+  max-width:450px;
+  margin:auto;
+}
+
+.logo{
+
+  width:100px;
+  height:100px;
+
+  border-radius:50%;
+
+  margin:30px auto 18px;
+
+  background:linear-gradient(135deg,#d08a3a,#8a4f1f);
+
+  color:#111;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  font-size:36px;
+
+  font-weight:bold;
+}
+
+h1{
+  text-align:center;
+  margin-bottom:10px;
+}
+
+.subtitle{
+  text-align:center;
+  color:#ccc;
+  margin-bottom:24px;
+}
+
+.card{
+
+  background:rgba(15,15,15,.95);
+
+  border:1px solid rgba(208,138,58,.28);
+
+  border-radius:28px;
+
+  padding:24px;
+}
+
+.input-group{
+  margin-bottom:16px;
+}
+
+label{
+
+  display:block;
+
+  margin-bottom:8px;
+
+  color:#d08a3a;
+
+  font-weight:bold;
+}
+
+input{
+
+  width:100%;
+
+  padding:15px;
+
+  border:none;
+
+  border-radius:16px;
+
+  background:#1e1e1e;
+
+  color:white;
+
+  font-size:15px;
+}
+
+.btn{
+
+  width:100%;
+
+  border:none;
+
+  padding:16px;
+
+  border-radius:16px;
+
+  background:linear-gradient(135deg,#d08a3a,#8a4f1f);
+
+  color:#111;
+
+  font-weight:bold;
+
+  font-size:16px;
+
+  cursor:pointer;
+
+  margin-top:10px;
+}
+
+.back{
+
+  display:block;
+
+  text-align:center;
+
+  margin-top:16px;
+
+  color:#aaa;
+
+  text-decoration:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="logo">DP</div>
+
+  <h1>Área do barbeiro</h1>
+
+  <p class="subtitle">
+    Faça login para acessar o painel.
+  </p>
+
+  <div class="card">
+
+    <div class="input-group">
+      <label>E-mail</label>
+      <input type="email" id="email">
+    </div>
+
+    <div class="input-group">
+      <label>Senha</label>
+      <input type="password" id="senha">
+    </div>
+
+    <button class="btn" onclick="login()">
+      Entrar
+    </button>
+
+    <a href="index.html" class="back">
+      Voltar
+    </a>
+
+  </div>
+
+</div>
+
+<script>
+
+function login(){
+
+  const email =
+    document.getElementById("email").value;
+
+  const senha =
+    document.getElementById("senha").value;
+
+  if(
+    email === "admin@dapaz.com" &&
+    senha === "123456"
+  ){
+
+    window.location.href = "barbeiro.html";
+
+  }else{
+
+    alert("E-mail ou senha incorretos.");
+
+  }
+
+}
+
+</script>
+
+</body>
+</html>
