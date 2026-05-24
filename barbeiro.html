@@ -57,10 +57,33 @@ h1{
   margin-bottom:24px;
 }
 
+.filters{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.input-group label{
+  display:block;
+  margin-bottom:8px;
+  color:#d08a3a;
+  font-weight:bold;
+}
+
+input,select{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  background:#1e1e1e;
+  color:white;
+}
+
 .dashboard{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
   margin-bottom:22px;
 }
 
@@ -68,18 +91,19 @@ h1{
   background:rgba(15,15,15,.95);
   border:1px solid rgba(208,138,58,.28);
   border-radius:22px;
-  padding:20px;
+  padding:18px;
   text-align:center;
 }
 
 .card h2{
   color:#d08a3a;
-  font-size:30px;
+  font-size:28px;
   margin-bottom:8px;
 }
 
 .card p{
   color:#bbb;
+  font-size:14px;
 }
 
 .lista{
@@ -123,29 +147,37 @@ h1{
   font-weight:bold;
 }
 
-.status.confirmado{
+.confirmado{
   background:#103d24;
   color:#72f59f;
 }
 
-.status.concluido{
+.concluido{
   background:#123a5a;
   color:#7bc2ff;
 }
 
+.cancelado{
+  background:#5a1717;
+  color:#ff9494;
+}
+
 .btns{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(4,1fr);
   gap:10px;
   margin-top:14px;
 }
 
-button{
+button,a.btn{
   padding:12px;
   border:none;
   border-radius:13px;
   font-weight:bold;
   cursor:pointer;
+  text-align:center;
+  text-decoration:none;
+  font-size:13px;
 }
 
 .confirmar{
@@ -158,8 +190,13 @@ button{
   color:white;
 }
 
-.excluir{
-  background:#741919;
+.cancelar{
+  background:#5a1717;
+  color:white;
+}
+
+.whats{
+  background:#16803a;
   color:white;
 }
 
@@ -175,23 +212,15 @@ button{
   font-weight:bold;
 }
 
-.sair{
-  width:100%;
-  margin-bottom:18px;
-  padding:14px;
-  border-radius:16px;
-  background:#222;
-  color:white;
-}
-
 .vazio{
   text-align:center;
   color:#aaa;
   padding:20px;
 }
 
-@media(max-width:700px){
+@media(max-width:760px){
   .dashboard,
+  .filters,
   .btns{
     grid-template-columns:1fr;
   }
@@ -210,12 +239,27 @@ button{
   <h1>Painel do barbeiro</h1>
 
   <p class="subtitle">
-    Controle dos agendamentos da Barbearia Da Paz.
+    Agendamentos reais salvos no Firebase.
   </p>
 
-  <button class="sair" onclick="sair()">
-    Sair da conta
-  </button>
+  <div class="filters">
+
+    <div class="input-group">
+      <label>Filtrar por data</label>
+      <input type="date" id="filtroData" onchange="carregarAgendamentos()">
+    </div>
+
+    <div class="input-group">
+      <label>Filtrar por barbeiro</label>
+      <select id="filtroBarbeiro" onchange="carregarAgendamentos()">
+        <option value="Todos">Todos</option>
+        <option value="Felipe">Felipe</option>
+        <option value="Carlos">Carlos</option>
+        <option value="João">João</option>
+      </select>
+    </div>
+
+  </div>
 
   <div class="dashboard">
 
@@ -225,13 +269,18 @@ button{
     </div>
 
     <div class="card">
-      <h2 id="confirmados">0</h2>
-      <p>Confirmados</p>
+      <h2 id="pendentes">0</h2>
+      <p>Pendentes</p>
+    </div>
+
+    <div class="card">
+      <h2 id="concluidos">0</h2>
+      <p>Concluídos</p>
     </div>
 
     <div class="card">
       <h2 id="ganhos">R$ 0</h2>
-      <p>Ganhos concluídos</p>
+      <p>Ganhos</p>
     </div>
 
   </div>
@@ -252,103 +301,161 @@ button{
 
 </div>
 
-<script>
-function buscarAgendamentos(){
-  return JSON.parse(localStorage.getItem("agendamentos")) || [];
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  updateDoc,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDoXPstgyshmkHH8J_KrYVaejd-_fAa_PI",
+  authDomain: "barbearia-da-paz.firebaseapp.com",
+  projectId: "barbearia-da-paz",
+  storageBucket: "barbearia-da-paz.firebasestorage.app",
+  messagingSenderId: "352751065325",
+  appId: "1:352751065325:web:bb584e5474dccfc0d294e4"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const hoje = new Date().toISOString().split("T")[0];
+document.getElementById("filtroData").value = hoje;
+
+function statusClasse(status){
+  if(status === "Confirmado") return "confirmado";
+  if(status === "Concluído") return "concluido";
+  if(status === "Cancelado") return "cancelado";
+  return "";
 }
 
-function salvarAgendamentos(lista){
-  localStorage.setItem("agendamentos", JSON.stringify(lista));
+function textoSeguro(valor){
+  return valor || "Não informado";
 }
 
-function renderizar(){
-  const lista = buscarAgendamentos();
+function montarWhatsapp(ag){
+  const mensagem =
+`Olá, ${ag.nome}. Seu horário na Barbearia Da Paz está registrado.
+
+Serviço: ${ag.servico}
+Barbeiro: ${ag.barbeiro}
+Data: ${ag.data}
+Horário: ${ag.hora}`;
+
+  return `https://wa.me/55${String(ag.telefone).replace(/\D/g,"")}?text=${encodeURIComponent(mensagem)}`;
+}
+
+window.carregarAgendamentos = async function(){
   const area = document.getElementById("listaAgendamentos");
+  const filtroData = document.getElementById("filtroData").value;
+  const filtroBarbeiro = document.getElementById("filtroBarbeiro").value;
+
+  area.innerHTML = `<p class="vazio">Carregando...</p>`;
+
+  const q = query(
+    collection(db, "agendamentos"),
+    orderBy("criadoEm", "desc")
+  );
+
+  const resultado = await getDocs(q);
+
+  let total = 0;
+  let pendentes = 0;
+  let concluidos = 0;
+  let ganhos = 0;
 
   area.innerHTML = "";
 
-  if(lista.length === 0){
-    area.innerHTML = `<p class="vazio">Nenhum agendamento encontrado.</p>`;
-  }
+  resultado.forEach((documento) => {
+    const ag = documento.data();
+    const id = documento.id;
 
-  let total = lista.length;
-  let confirmados = 0;
-  let ganhos = 0;
+    const passaData = !filtroData || ag.data === filtroData;
+    const passaBarbeiro = filtroBarbeiro === "Todos" || ag.barbeiro === filtroBarbeiro;
 
-  lista.forEach((ag, index) => {
-    if(ag.status === "Confirmado"){
-      confirmados++;
+    if(!passaData || !passaBarbeiro){
+      return;
     }
 
-    if(ag.status === "Concluído"){
-      ganhos += Number(ag.valor);
+    const status = ag.status || "Pendente";
+
+    total++;
+
+    if(status === "Pendente"){
+      pendentes++;
     }
 
-    const classeStatus =
-      ag.status === "Confirmado" ? "confirmado" :
-      ag.status === "Concluído" ? "concluido" : "";
+    if(status === "Concluído"){
+      concluidos++;
+      ganhos += Number(ag.valor || 0);
+    }
 
     area.innerHTML += `
       <div class="agendamento">
-        <p><strong>Cliente:</strong> ${ag.nome}</p>
-        <p><strong>Telefone:</strong> ${ag.telefone}</p>
-        <p><strong>Serviço:</strong> ${ag.servico}</p>
-        <p><strong>Barbeiro:</strong> ${ag.barbeiro}</p>
-        <p><strong>Data:</strong> ${ag.data}</p>
-        <p><strong>Horário:</strong> ${ag.hora}</p>
-        <p><strong>Valor:</strong> R$ ${ag.valor}</p>
 
-        <span class="status ${classeStatus}">
-          ${ag.status}
+        <p><strong>Cliente:</strong> ${textoSeguro(ag.nome)}</p>
+        <p><strong>Telefone:</strong> ${textoSeguro(ag.telefone)}</p>
+        <p><strong>Serviço:</strong> ${textoSeguro(ag.servico)}</p>
+        <p><strong>Barbeiro:</strong> ${textoSeguro(ag.barbeiro)}</p>
+        <p><strong>Data:</strong> ${textoSeguro(ag.data)}</p>
+        <p><strong>Horário:</strong> ${textoSeguro(ag.hora)}</p>
+        <p><strong>Valor:</strong> R$ ${ag.valor || 0}</p>
+
+        <span class="status ${statusClasse(status)}">
+          ${status}
         </span>
 
         <div class="btns">
-          <button class="confirmar" onclick="mudarStatus(${index}, 'Confirmado')">
+
+          <button class="confirmar" onclick="alterarStatus('${id}', 'Confirmado')">
             Confirmar
           </button>
 
-          <button class="concluir" onclick="mudarStatus(${index}, 'Concluído')">
+          <button class="concluir" onclick="alterarStatus('${id}', 'Concluído')">
             Concluir
           </button>
 
-          <button class="excluir" onclick="excluirAgendamento(${index})">
-            Excluir
+          <button class="cancelar" onclick="alterarStatus('${id}', 'Cancelado')">
+            Cancelar
           </button>
+
+          <a class="btn whats" href="${montarWhatsapp(ag)}" target="_blank">
+            WhatsApp
+          </a>
+
         </div>
+
       </div>
     `;
   });
 
+  if(total === 0){
+    area.innerHTML = `<p class="vazio">Nenhum agendamento encontrado.</p>`;
+  }
+
   document.getElementById("total").textContent = total;
-  document.getElementById("confirmados").textContent = confirmados;
+  document.getElementById("pendentes").textContent = pendentes;
+  document.getElementById("concluidos").textContent = concluidos;
   document.getElementById("ganhos").textContent = "R$ " + ganhos;
 }
 
-function mudarStatus(index, status){
-  const lista = buscarAgendamentos();
-  lista[index].status = status;
-  salvarAgendamentos(lista);
-  renderizar();
+window.alterarStatus = async function(id, status){
+  await updateDoc(doc(db, "agendamentos", id), {
+    status: status
+  });
+
+  carregarAgendamentos();
 }
 
-function excluirAgendamento(index){
-  const confirmar = confirm("Deseja excluir este agendamento?");
-
-  if(!confirmar){
-    return;
-  }
-
-  const lista = buscarAgendamentos();
-  lista.splice(index, 1);
-  salvarAgendamentos(lista);
-  renderizar();
-}
-
-function sair(){
-  window.location.href = "login.html";
-}
-
-renderizar();
+carregarAgendamentos();
 </script>
 
 </body>

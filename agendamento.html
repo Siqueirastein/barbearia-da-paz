@@ -76,8 +76,7 @@ label{
   font-weight:bold;
 }
 
-input,
-select{
+input,select{
   width:100%;
   padding:15px;
   border:none;
@@ -107,6 +106,13 @@ select{
 .horario.selecionado{
   background:linear-gradient(135deg,#d08a3a,#8a4f1f);
   color:#111;
+}
+
+.horario.ocupado{
+  background:#5a1a1a;
+  color:#aaa;
+  cursor:not-allowed;
+  text-decoration:line-through;
 }
 
 .resumo{
@@ -195,7 +201,7 @@ select{
 
     <div class="input-group">
       <label>Barbeiro</label>
-      <select id="barbeiro" onchange="atualizarResumo()">
+      <select id="barbeiro" onchange="carregarHorarios(); atualizarResumo();">
         <option>Felipe</option>
         <option>Carlos</option>
         <option>João</option>
@@ -204,19 +210,13 @@ select{
 
     <div class="input-group">
       <label>Data</label>
-      <input type="date" id="data" onchange="atualizarResumo()">
+      <input type="date" id="data" onchange="carregarHorarios(); atualizarResumo();">
     </div>
 
     <div class="input-group">
       <label>Horários disponíveis</label>
-
-      <div class="horarios">
-        <button class="horario" onclick="selecionarHorario('09:00', this)">09:00</button>
-        <button class="horario" onclick="selecionarHorario('10:00', this)">10:00</button>
-        <button class="horario" onclick="selecionarHorario('11:00', this)">11:00</button>
-        <button class="horario" onclick="selecionarHorario('14:00', this)">14:00</button>
-        <button class="horario" onclick="selecionarHorario('15:00', this)">15:00</button>
-        <button class="horario" onclick="selecionarHorario('16:00', this)">16:00</button>
+      <div class="horarios" id="listaHorarios">
+        <p style="color:#aaa;">Escolha uma data</p>
       </div>
     </div>
 
@@ -241,8 +241,40 @@ select{
 
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDoXPstgyshmkHH8J_KrYVaejd-_fAa_PI",
+  authDomain: "barbearia-da-paz.firebaseapp.com",
+  projectId: "barbearia-da-paz",
+  storageBucket: "barbearia-da-paz.firebasestorage.app",
+  messagingSenderId: "352751065325",
+  appId: "1:352751065325:web:bb584e5474dccfc0d294e4"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 let horarioSelecionado = "";
+
+const horariosFixos = [
+  "09:00","10:00","11:00",
+  "13:00","14:00","15:00",
+  "16:00","17:00","18:00"
+];
+
+const hoje = new Date().toISOString().split("T")[0];
+document.getElementById("data").setAttribute("min", hoje);
 
 function precoServico(servico){
   if(servico === "Corte masculino") return 35;
@@ -252,19 +284,7 @@ function precoServico(servico){
   return 0;
 }
 
-function selecionarHorario(hora, botao){
-  horarioSelecionado = hora;
-
-  document.querySelectorAll(".horario").forEach((btn) => {
-    btn.classList.remove("selecionado");
-  });
-
-  botao.classList.add("selecionado");
-
-  atualizarResumo();
-}
-
-function atualizarResumo(){
+window.atualizarResumo = function(){
   const servico = document.getElementById("servico").value;
   const barbeiro = document.getElementById("barbeiro").value;
   const data = document.getElementById("data").value;
@@ -276,7 +296,64 @@ function atualizarResumo(){
   document.getElementById("resumoValor").textContent = "R$ " + precoServico(servico);
 }
 
-function confirmarAgendamento(){
+window.carregarHorarios = async function(){
+  const data = document.getElementById("data").value;
+  const barbeiro = document.getElementById("barbeiro").value;
+  const lista = document.getElementById("listaHorarios");
+
+  horarioSelecionado = "";
+  atualizarResumo();
+
+  if(data === ""){
+    lista.innerHTML = `<p style="color:#aaa;">Escolha uma data</p>`;
+    return;
+  }
+
+  lista.innerHTML = `<p style="color:#aaa;">Carregando...</p>`;
+
+  const q = query(
+    collection(db, "agendamentos"),
+    where("data", "==", data),
+    where("barbeiro", "==", barbeiro)
+  );
+
+  const resultado = await getDocs(q);
+  const ocupados = [];
+
+  resultado.forEach((doc) => {
+    ocupados.push(doc.data().hora);
+  });
+
+  lista.innerHTML = "";
+
+  horariosFixos.forEach((hora) => {
+    const ocupado = ocupados.includes(hora);
+
+    lista.innerHTML += `
+      <button
+        type="button"
+        class="horario ${ocupado ? "ocupado" : ""}"
+        ${ocupado ? "disabled" : ""}
+        onclick="selecionarHorario('${hora}', this)"
+      >
+        ${hora}
+      </button>
+    `;
+  });
+}
+
+window.selecionarHorario = function(hora, botao){
+  horarioSelecionado = hora;
+
+  document.querySelectorAll(".horario").forEach((btn) => {
+    btn.classList.remove("selecionado");
+  });
+
+  botao.classList.add("selecionado");
+  atualizarResumo();
+}
+
+window.confirmarAgendamento = async function(){
   const nome = document.getElementById("nome").value;
   const telefone = document.getElementById("telefone").value;
   const servico = document.getElementById("servico").value;
@@ -288,7 +365,7 @@ function confirmarAgendamento(){
     return;
   }
 
-  const agendamento = {
+  await addDoc(collection(db, "agendamentos"), {
     nome,
     telefone,
     servico,
@@ -296,12 +373,9 @@ function confirmarAgendamento(){
     data,
     hora: horarioSelecionado,
     valor: precoServico(servico),
-    status: "Pendente"
-  };
-
-  const lista = JSON.parse(localStorage.getItem("agendamentos")) || [];
-  lista.push(agendamento);
-  localStorage.setItem("agendamentos", JSON.stringify(lista));
+    status: "Pendente",
+    criadoEm: new Date()
+  });
 
   const mensagem =
 `Olá, gostaria de confirmar meu horário na Barbearia Da Paz.
@@ -317,7 +391,10 @@ Valor: R$ ${precoServico(servico)}`;
   const numero = "5591982041321";
   const link = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
 
+  alert("Agendamento salvo com sucesso!");
   window.open(link, "_blank");
+
+  carregarHorarios();
 }
 
 atualizarResumo();
