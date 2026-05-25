@@ -7,6 +7,7 @@
 <title>Painel • Barbearia Da Paz</title>
 
 <style>
+
 *{
   margin:0;
   padding:0;
@@ -16,9 +17,11 @@
 
 body{
   min-height:100vh;
+
   background:
-    linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,.95)),
-    url("https://images.unsplash.com/photo-1585747860715-2ba37e788b70") center/cover;
+  linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,.95)),
+  url("https://images.unsplash.com/photo-1585747860715-2ba37e788b70") center/cover;
+
   color:white;
   padding:24px;
 }
@@ -57,6 +60,34 @@ h1{
   margin-bottom:24px;
 }
 
+.topbar{
+  display:flex;
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.logout{
+  flex:1;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  background:#222;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.refresh{
+  flex:1;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  background:linear-gradient(135deg,#d08a3a,#8a4f1f);
+  color:#111;
+  font-weight:bold;
+  cursor:pointer;
+}
+
 .filters{
   display:grid;
   grid-template-columns:repeat(2,1fr);
@@ -71,7 +102,8 @@ h1{
   font-weight:bold;
 }
 
-input,select{
+input,
+select{
   width:100%;
   padding:14px;
   border:none;
@@ -169,7 +201,8 @@ input,select{
   margin-top:14px;
 }
 
-button,a.btn{
+button,
+a.btn{
   padding:12px;
   border:none;
   border-radius:13px;
@@ -218,19 +251,42 @@ button,a.btn{
   padding:20px;
 }
 
+.loading{
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+  font-size:20px;
+  font-weight:bold;
+}
+
 @media(max-width:760px){
+
   .dashboard,
   .filters,
   .btns{
     grid-template-columns:1fr;
   }
+
+  .topbar{
+    flex-direction:column;
+  }
+
 }
+
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="loading" id="loading">
+Verificando acesso...
+</div>
+
+<div class="container" id="painel" style="display:none;">
 
   <div class="logo">
     <img src="assets/logo.png" alt="Logo Barbearia Da Paz">
@@ -239,24 +295,47 @@ button,a.btn{
   <h1>Painel do barbeiro</h1>
 
   <p class="subtitle">
-    Agendamentos reais salvos no Firebase.
+    Sistema profissional da Barbearia Da Paz.
   </p>
+
+  <div class="topbar">
+
+    <button class="logout" onclick="sair()">
+      Sair da conta
+    </button>
+
+    <button class="refresh" onclick="carregarAgendamentos()">
+      Atualizar painel
+    </button>
+
+  </div>
 
   <div class="filters">
 
     <div class="input-group">
       <label>Filtrar por data</label>
-      <input type="date" id="filtroData" onchange="carregarAgendamentos()">
+      <input
+        type="date"
+        id="filtroData"
+        onchange="carregarAgendamentos()"
+      >
     </div>
 
     <div class="input-group">
       <label>Filtrar por barbeiro</label>
-      <select id="filtroBarbeiro" onchange="carregarAgendamentos()">
+
+      <select
+        id="filtroBarbeiro"
+        onchange="carregarAgendamentos()"
+      >
+
         <option value="Todos">Todos</option>
         <option value="Felipe">Felipe</option>
         <option value="Carlos">Carlos</option>
         <option value="João">João</option>
+
       </select>
+
     </div>
 
   </div>
@@ -302,6 +381,7 @@ button,a.btn{
 </div>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
 
 import {
@@ -311,9 +391,14 @@ import {
   query,
   orderBy,
   updateDoc,
-  deleteDoc,
   doc
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDoXPstgyshmkHH8J_KrYVaejd-_fAa_PI",
@@ -325,25 +410,50 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
 const db = getFirestore(app);
 
+const auth = getAuth(app);
+
 const hoje = new Date().toISOString().split("T")[0];
+
 document.getElementById("filtroData").value = hoje;
 
+onAuthStateChanged(auth,(user)=>{
+
+  if(user){
+
+    document.getElementById("loading").style.display = "none";
+
+    document.getElementById("painel").style.display = "block";
+
+    carregarAgendamentos();
+
+  }else{
+
+    window.location.href = "login.html";
+  }
+
+});
+
 function statusClasse(status){
+
   if(status === "Confirmado") return "confirmado";
+
   if(status === "Concluído") return "concluido";
+
   if(status === "Cancelado") return "cancelado";
+
   return "";
 }
 
-function textoSeguro(valor){
-  return valor || "Não informado";
-}
-
 function montarWhatsapp(ag){
+
   const mensagem =
-`Olá, ${ag.nome}. Seu horário na Barbearia Da Paz está registrado.
+
+`Olá, ${ag.nome}.
+
+Seu horário na Barbearia Da Paz está registrado.
 
 Serviço: ${ag.servico}
 Barbeiro: ${ag.barbeiro}
@@ -354,15 +464,25 @@ Horário: ${ag.hora}`;
 }
 
 window.carregarAgendamentos = async function(){
-  const area = document.getElementById("listaAgendamentos");
-  const filtroData = document.getElementById("filtroData").value;
-  const filtroBarbeiro = document.getElementById("filtroBarbeiro").value;
 
-  area.innerHTML = `<p class="vazio">Carregando...</p>`;
+  const area =
+    document.getElementById("listaAgendamentos");
+
+  const filtroData =
+    document.getElementById("filtroData").value;
+
+  const filtroBarbeiro =
+    document.getElementById("filtroBarbeiro").value;
+
+  area.innerHTML = `
+    <p class="vazio">
+      Carregando...
+    </p>
+  `;
 
   const q = query(
-    collection(db, "agendamentos"),
-    orderBy("criadoEm", "desc")
+    collection(db,"agendamentos"),
+    orderBy("criadoEm","desc")
   );
 
   const resultado = await getDocs(q);
@@ -374,18 +494,24 @@ window.carregarAgendamentos = async function(){
 
   area.innerHTML = "";
 
-  resultado.forEach((documento) => {
+  resultado.forEach((documento)=>{
+
     const ag = documento.data();
+
     const id = documento.id;
 
-    const passaData = !filtroData || ag.data === filtroData;
-    const passaBarbeiro = filtroBarbeiro === "Todos" || ag.barbeiro === filtroBarbeiro;
+    const status = ag.status || "Pendente";
+
+    const passaData =
+      !filtroData || ag.data === filtroData;
+
+    const passaBarbeiro =
+      filtroBarbeiro === "Todos" ||
+      ag.barbeiro === filtroBarbeiro;
 
     if(!passaData || !passaBarbeiro){
       return;
     }
-
-    const status = ag.status || "Pendente";
 
     total++;
 
@@ -399,15 +525,22 @@ window.carregarAgendamentos = async function(){
     }
 
     area.innerHTML += `
+
       <div class="agendamento">
 
-        <p><strong>Cliente:</strong> ${textoSeguro(ag.nome)}</p>
-        <p><strong>Telefone:</strong> ${textoSeguro(ag.telefone)}</p>
-        <p><strong>Serviço:</strong> ${textoSeguro(ag.servico)}</p>
-        <p><strong>Barbeiro:</strong> ${textoSeguro(ag.barbeiro)}</p>
-        <p><strong>Data:</strong> ${textoSeguro(ag.data)}</p>
-        <p><strong>Horário:</strong> ${textoSeguro(ag.hora)}</p>
-        <p><strong>Valor:</strong> R$ ${ag.valor || 0}</p>
+        <p><strong>Cliente:</strong> ${ag.nome}</p>
+
+        <p><strong>Telefone:</strong> ${ag.telefone}</p>
+
+        <p><strong>Serviço:</strong> ${ag.servico}</p>
+
+        <p><strong>Barbeiro:</strong> ${ag.barbeiro}</p>
+
+        <p><strong>Data:</strong> ${ag.data}</p>
+
+        <p><strong>Horário:</strong> ${ag.hora}</p>
+
+        <p><strong>Valor:</strong> R$ ${ag.valor}</p>
 
         <span class="status ${statusClasse(status)}">
           ${status}
@@ -415,47 +548,77 @@ window.carregarAgendamentos = async function(){
 
         <div class="btns">
 
-          <button class="confirmar" onclick="alterarStatus('${id}', 'Confirmado')">
+          <button
+            class="confirmar"
+            onclick="alterarStatus('${id}','Confirmado')"
+          >
             Confirmar
           </button>
 
-          <button class="concluir" onclick="alterarStatus('${id}', 'Concluído')">
+          <button
+            class="concluir"
+            onclick="alterarStatus('${id}','Concluído')"
+          >
             Concluir
           </button>
 
-          <button class="cancelar" onclick="alterarStatus('${id}', 'Cancelado')">
+          <button
+            class="cancelar"
+            onclick="alterarStatus('${id}','Cancelado')"
+          >
             Cancelar
           </button>
 
-          <a class="btn whats" href="${montarWhatsapp(ag)}" target="_blank">
+          <a
+            class="btn whats"
+            href="${montarWhatsapp(ag)}"
+            target="_blank"
+          >
             WhatsApp
           </a>
 
         </div>
 
       </div>
+
     `;
+
   });
 
   if(total === 0){
-    area.innerHTML = `<p class="vazio">Nenhum agendamento encontrado.</p>`;
+
+    area.innerHTML = `
+      <p class="vazio">
+        Nenhum agendamento encontrado.
+      </p>
+    `;
   }
 
   document.getElementById("total").textContent = total;
+
   document.getElementById("pendentes").textContent = pendentes;
+
   document.getElementById("concluidos").textContent = concluidos;
-  document.getElementById("ganhos").textContent = "R$ " + ganhos;
+
+  document.getElementById("ganhos").textContent = `R$ ${ganhos}`;
 }
 
-window.alterarStatus = async function(id, status){
-  await updateDoc(doc(db, "agendamentos", id), {
-    status: status
+window.alterarStatus = async function(id,status){
+
+  await updateDoc(doc(db,"agendamentos",id),{
+    status:status
   });
 
   carregarAgendamentos();
 }
 
-carregarAgendamentos();
+window.sair = async function(){
+
+  await signOut(auth);
+
+  window.location.href = "login.html";
+}
+
 </script>
 
 </body>

@@ -7,7 +7,6 @@
 <title>Login • Barbearia Da Paz</title>
 
 <style>
-
 *{
   margin:0;
   padding:0;
@@ -16,15 +15,11 @@
 }
 
 body{
-
   min-height:100vh;
-
   background:
   linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,.95)),
   url("https://images.unsplash.com/photo-1503951914875-452162b0f3f1") center/cover;
-
   color:white;
-
   padding:24px;
 }
 
@@ -34,27 +29,21 @@ body{
 }
 
 .logo{
-
-  width:100px;
-  height:100px;
-
-  border-radius:50%;
-
+  width:120px;
+  height:120px;
   margin:30px auto 18px;
+  border-radius:50%;
+  overflow:hidden;
+  border:2px solid #d08a3a;
+  background:#111;
+  box-shadow:0 0 35px rgba(208,138,58,.35);
+}
 
-  background:linear-gradient(135deg,#d08a3a,#8a4f1f);
-
-  color:#111;
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  font-size:36px;
-
-  font-weight:bold;
+.logo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
 }
 
 h1{
@@ -69,13 +58,9 @@ h1{
 }
 
 .card{
-
   background:rgba(15,15,15,.95);
-
   border:1px solid rgba(208,138,58,.28);
-
   border-radius:28px;
-
   padding:24px;
 }
 
@@ -84,69 +69,42 @@ h1{
 }
 
 label{
-
   display:block;
-
   margin-bottom:8px;
-
   color:#d08a3a;
-
   font-weight:bold;
 }
 
 input{
-
   width:100%;
-
   padding:15px;
-
   border:none;
-
   border-radius:16px;
-
   background:#1e1e1e;
-
   color:white;
-
   font-size:15px;
 }
 
 .btn{
-
   width:100%;
-
   border:none;
-
   padding:16px;
-
   border-radius:16px;
-
   background:linear-gradient(135deg,#d08a3a,#8a4f1f);
-
   color:#111;
-
   font-weight:bold;
-
   font-size:16px;
-
   cursor:pointer;
-
   margin-top:10px;
 }
 
 .back{
-
   display:block;
-
   text-align:center;
-
   margin-top:16px;
-
   color:#aaa;
-
   text-decoration:none;
 }
-
 </style>
 </head>
 
@@ -154,27 +112,29 @@ input{
 
 <div class="container">
 
-  <div class="logo">DP</div>
+  <div class="logo">
+    <img src="assets/logo.png" alt="Logo Barbearia Da Paz">
+  </div>
 
   <h1>Área do barbeiro</h1>
 
   <p class="subtitle">
-    Faça login para acessar o painel.
+    Login administrativo da Barbearia Da Paz.
   </p>
 
   <div class="card">
 
     <div class="input-group">
       <label>E-mail</label>
-      <input type="email" id="email">
+      <input type="email" id="email" placeholder="Digite seu e-mail">
     </div>
 
     <div class="input-group">
       <label>Senha</label>
-      <input type="password" id="senha">
+      <input type="password" id="senha" placeholder="Digite sua senha">
     </div>
 
-    <button class="btn" onclick="login()">
+    <button class="btn" onclick="fazerLogin()">
       Entrar
     </button>
 
@@ -186,31 +146,42 @@ input{
 
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
 
-function login(){
+import {
+  getAuth,
+  signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 
-  const email =
-    document.getElementById("email").value;
+const firebaseConfig = {
+  apiKey: "AIzaSyDoXPstgyshmkHH8J_KrYVaejd-_fAa_PI",
+  authDomain: "barbearia-da-paz.firebaseapp.com",
+  projectId: "barbearia-da-paz",
+  storageBucket: "barbearia-da-paz.firebasestorage.app",
+  messagingSenderId: "352751065325",
+  appId: "1:352751065325:web:bb584e5474dccfc0d294e4"
+};
 
-  const senha =
-    document.getElementById("senha").value;
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-  if(
-    email === "admin@dapaz.com" &&
-    senha === "123456"
-  ){
+window.fazerLogin = async function(){
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
 
-    window.location.href = "barbeiro.html";
-
-  }else{
-
-    alert("E-mail ou senha incorretos.");
-
+  if(email === "" || senha === ""){
+    alert("Preencha e-mail e senha.");
+    return;
   }
 
+  try{
+    await signInWithEmailAndPassword(auth, email, senha);
+    window.location.href = "barbeiro.html";
+  }catch(error){
+    alert("E-mail ou senha incorretos.");
+  }
 }
-
 </script>
 
 </body>

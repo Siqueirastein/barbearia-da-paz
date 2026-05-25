@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Serviços • Barbearia Da Paz</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  min-height:100vh;
+  background:
+    linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,.95)),
+    url("https://images.unsplash.com/photo-1503951914875-452162b0f3f1") center/cover;
+  color:white;
+  padding:24px;
+}
+
+.container{
+  max-width:900px;
+  margin:auto;
+}
+
+.logo{
+  width:120px;
+  height:120px;
+  margin:25px auto 18px;
+  border-radius:50%;
+  overflow:hidden;
+  border:2px solid #d08a3a;
+  background:#111;
+  box-shadow:0 0 35px rgba(208,138,58,.35);
+}
+
+.logo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+h1{
+  text-align:center;
+  margin-bottom:10px;
+}
+
+.subtitle{
+  text-align:center;
+  color:#ccc;
+  margin-bottom:24px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+}
+
+.service{
+  background:rgba(15,15,15,.95);
+  border:1px solid rgba(208,138,58,.28);
+  border-radius:24px;
+  padding:22px;
+}
+
+.service h2{
+  color:#d08a3a;
+  margin-bottom:10px;
+}
+
+.service p{
+  color:#ccc;
+  line-height:1.5;
+  margin-bottom:14px;
+}
+
+.info{
+  display:flex;
+  justify-content:space-between;
+  background:#1f1f1f;
+  padding:13px;
+  border-radius:14px;
+  margin-bottom:10px;
+}
+
+.info strong{
+  color:#d08a3a;
+}
+
+.btn,.back{
+  display:block;
+  text-align:center;
+  text-decoration:none;
+  padding:15px;
+  border-radius:16px;
+  font-weight:bold;
+  margin-top:12px;
+}
+
+.btn{
+  background:linear-gradient(135deg,#d08a3a,#8a4f1f);
+  color:#111;
+}
+
+.back{
+  background:#222;
+  color:white;
+}
+
+@media(max-width:700px){
+  .grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="logo">
+    <img src="assets/logo.png" alt="Logo Barbearia Da Paz">
+  </div>
+
+  <h1>Serviços</h1>
+
+  <p class="subtitle">
+    Escolha o serviço ideal e agende seu horário.
+  </p>
+
+  <div class="grid">
+
+    <div class="service">
+      <h2>Corte masculino</h2>
+      <p>Corte moderno, alinhado ao seu estilo e com acabamento profissional.</p>
+
+      <div class="info">
+        <span>Valor</span>
+        <strong>R$ 35</strong>
+      </div>
+
+      <div class="info">
+        <span>Duração</span>
+        <strong>40 min</strong>
+      </div>
+
+      <a href="agendamento.html" class="btn">Agendar corte</a>
+    </div>
+
+    <div class="service">
+      <h2>Barba completa</h2>
+      <p>Modelagem, alinhamento e finalização para uma barba bem definida.</p>
+
+      <div class="info">
+        <span>Valor</span>
+        <strong>R$ 25</strong>
+      </div>
+
+      <div class="info">
+        <span>Duração</span>
+        <strong>30 min</strong>
+      </div>
+
+      <a href="agendamento.html" class="btn">Agendar barba</a>
+    </div>
+
+    <div class="service">
+      <h2>Corte + Barba</h2>
+      <p>Experiência completa com corte, barba e acabamento premium.</p>
+
+      <div class="info">
+        <span>Valor</span>
+        <strong>R$ 55</strong>
+      </div>
+
+      <div class="info">
+        <span>Duração</span>
+        <strong>1h</strong>
+      </div>
+
+      <a href="agendamento.html" class="btn">Agendar combo</a>
+    </div>
+
+    <div class="service">
+      <h2>Plano VIP</h2>
+      <p>Plano mensal para clientes que querem manter o visual sempre em dia.</p>
+
+      <div class="info">
+        <span>Valor</span>
+        <strong>R$ 99</strong>
+      </div>
+
+      <div class="info">
+        <span>Benefício</span>
+        <strong>Prioridade</strong>
+      </div>
+
+      <a href="vip.html" class="btn">Ver Plano VIP</a>
+    </div>
+
+  </div>
+
+  <a href="index.html" class="back">Voltar</a>
+
+</div>
+
+</body>
+</html>

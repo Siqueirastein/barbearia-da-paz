@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Planos VIP • Barbearia Da Paz</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+.grid{
+  grid-template-columns:repeat(3,1fr);
+}
+
+.plan{
+  position:relative;
+  overflow:hidden;
+}
+
+.plan::before{
+  content:"";
+  position:absolute;
+  top:-80px;
+  left:-80px;
+  width:160px;
+  height:160px;
+  background:radial-gradient(circle,rgba(208,138,58,.22),transparent 70%);
+  opacity:0;
+  transition:.35s;
+}
+
+.plan:hover::before{
+  opacity:1;
+}
+
+.recommended{
+  border:2px solid #d08a3a;
+  transform:scale(1.03);
+  box-shadow:0 0 35px rgba(208,138,58,.22);
+}
+
+.recommended:hover{
+  transform:translateY(-8px) scale(1.05);
+}
+
+.tag{
+  position:absolute;
+  top:16px;
+  right:16px;
+  background:#d08a3a;
+  color:#111;
+  padding:7px 12px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:bold;
+  animation:brilho 1.8s infinite;
+}
+
+@keyframes brilho{
+
+  0%{
+    opacity:.75;
+  }
+
+  50%{
+    opacity:1;
+    box-shadow:0 0 18px rgba(208,138,58,.7);
+  }
+
+  100%{
+    opacity:.75;
+  }
+
+}
+
+.plan h2{
+  font-size:30px;
+  margin-bottom:10px;
+}
+
+.price{
+  font-size:52px;
+  color:#d08a3a;
+  font-weight:bold;
+  margin-bottom:4px;
+}
+
+.price span{
+  font-size:18px;
+  color:#aaa;
+}
+
+.desc{
+  color:#bbb;
+  line-height:1.6;
+  margin-bottom:22px;
+}
+
+.benefits{
+  display:grid;
+  gap:12px;
+  margin-bottom:26px;
+}
+
+.benefit{
+  background:#1c1c1c;
+  padding:14px;
+  border-radius:14px;
+  border-left:4px solid #d08a3a;
+  color:#ddd;
+  line-height:1.5;
+  transition:.25s;
+}
+
+.benefit:hover{
+  transform:translateX(5px);
+  background:#242424;
+}
+
+.btn{
+  display:block;
+  text-align:center;
+}
+
+.btn::after{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-100%;
+  width:100%;
+  height:100%;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.35),
+    transparent
+  );
+  transition:.5s;
+}
+
+.btn:hover::after{
+  left:100%;
+}
+
+.back{
+  display:block;
+  text-align:center;
+  margin-top:30px;
+}
+
+@media(max-width:950px){
+
+  .recommended{
+    transform:none;
+  }
+
+  .recommended:hover{
+    transform:translateY(-8px) scale(1.02);
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="logo">
+    <img src="assets/logo.png" alt="Logo Barbearia Da Paz">
+  </div>
+
+  <h1>Planos VIP</h1>
+
+  <p class="subtitle">
+    Escolha o plano ideal para manter seu visual sempre em dia com benefícios exclusivos da Barbearia Da Paz.
+  </p>
+
+  <div class="grid">
+
+    <!-- BRONZE -->
+
+    <div class="plan">
+
+      <h2>VIP Bronze</h2>
+
+      <div class="price">
+        R$ 49
+        <span>/mês</span>
+      </div>
+
+      <p class="desc">
+        Ideal para quem quer economizar e ter prioridade básica.
+      </p>
+
+      <div class="benefits">
+
+        <div class="benefit">
+          ✔ 2 cortes por mês
+        </div>
+
+        <div class="benefit">
+          ✔ Prioridade leve nos horários
+        </div>
+
+        <div class="benefit">
+          ✔ 10% de desconto em produtos
+        </div>
+
+        <div class="benefit">
+          ✔ Promoções exclusivas
+        </div>
+
+      </div>
+
+      <a
+        href="https://wa.me/5591982041321?text=Olá,%20tenho%20interesse%20no%20Plano%20VIP%20Bronze."
+        class="btn primary"
+        target="_blank"
+      >
+        Assinar Bronze
+      </a>
+
+    </div>
+
+    <!-- GOLD -->
+
+    <div class="plan recommended">
+
+      <div class="tag">
+        MAIS ESCOLHIDO
+      </div>
+
+      <h2>VIP Gold</h2>
+
+      <div class="price">
+        R$ 99
+        <span>/mês</span>
+      </div>
+
+      <p class="desc">
+        O plano perfeito para clientes frequentes da barbearia.
+      </p>
+
+      <div class="benefits">
+
+        <div class="benefit">
+          ✔ Cortes ilimitados
+        </div>
+
+        <div class="benefit">
+          ✔ 1 barba grátis por mês
+        </div>
+
+        <div class="benefit">
+          ✔ Prioridade total nos horários
+        </div>
+
+        <div class="benefit">
+          ✔ Atendimento sem fila
+        </div>
+
+        <div class="benefit">
+          ✔ 20% OFF em produtos
+        </div>
+
+        <div class="benefit">
+          ✔ Bebida grátis
+        </div>
+
+      </div>
+
+      <a
+        href="https://wa.me/5591982041321?text=Olá,%20tenho%20interesse%20no%20Plano%20VIP%20Gold."
+        class="btn primary"
+        target="_blank"
+      >
+        Assinar Gold
+      </a>
+
+    </div>
+
+    <!-- BLACK -->
+
+    <div class="plan">
+
+      <h2>VIP Black</h2>
+
+      <div class="price">
+        R$ 199
+        <span>/mês</span>
+      </div>
+
+      <p class="desc">
+        Experiência máxima da Barbearia Da Paz para clientes premium.
+      </p>
+
+      <div class="benefits">
+
+        <div class="benefit">
+          ✔ Tudo do plano Gold
+        </div>
+
+        <div class="benefit">
+          ✔ Atendimento VIP exclusivo
+        </div>
+
+        <div class="benefit">
+          ✔ Horários reservados
+        </div>
+
+        <div class="benefit">
+          ✔ Corte em domicílio
+        </div>
+
+        <div class="benefit">
+          ✔ Lavagem premium inclusa
+        </div>
+
+        <div class="benefit">
+          ✔ Consultoria de estilo
+        </div>
+
+        <div class="benefit">
+          ✔ Brinde de aniversário
+        </div>
+
+      </div>
+
+      <a
+        href="https://wa.me/5591982041321?text=Olá,%20tenho%20interesse%20no%20Plano%20VIP%20Black."
+        class="btn primary"
+        target="_blank"
+      >
+        Assinar Black
+      </a>
+
+    </div>
+
+  </div>
+
+  <a href="index.html" class="btn secondary back">
+    Voltar para o início
+  </a>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Galeria • Barbearia Da Paz</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+.gallery{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+
+.cut{
+  background:rgba(15,15,15,.95);
+  border:1px solid rgba(208,138,58,.25);
+  border-radius:26px;
+  overflow:hidden;
+  transition:.3s;
+}
+
+.cut:hover{
+  transform:translateY(-8px) scale(1.02);
+  border-color:#d08a3a;
+  box-shadow:0 20px 60px rgba(0,0,0,.55);
+}
+
+.cut img{
+  width:100%;
+  height:260px;
+  object-fit:cover;
+  display:block;
+  transition:.35s;
+}
+
+.cut:hover img{
+  transform:scale(1.08);
+}
+
+.cut-content{
+  padding:18px;
+}
+
+.cut-content h2{
+  color:#d08a3a;
+  margin-bottom:8px;
+}
+
+.cut-content p{
+  color:#bbb;
+  line-height:1.5;
+}
+
+.back{
+  display:block;
+  text-align:center;
+  margin-top:30px;
+}
+
+@media(max-width:900px){
+  .gallery{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="logo">
+    <img src="assets/logo.png" alt="Logo Barbearia Da Paz">
+  </div>
+
+  <h1>Galeria de cortes</h1>
+
+  <p class="subtitle">
+    Veja alguns estilos de corte para se inspirar antes de agendar.
+  </p>
+
+  <div class="gallery">
+
+    <div class="cut">
+      <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033" alt="Low Fade">
+      <div class="cut-content">
+        <h2>Low Fade</h2>
+        <p>Degradê baixo, moderno e limpo.</p>
+      </div>
+    </div>
+
+    <div class="cut">
+      <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a" alt="Barba Premium">
+      <div class="cut-content">
+        <h2>Barba Premium</h2>
+        <p>Barba alinhada com acabamento profissional.</p>
+      </div>
+    </div>
+
+    <div class="cut">
+      <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1" alt="Corte Social">
+      <div class="cut-content">
+        <h2>Corte Social</h2>
+        <p>Visual elegante para rotina e eventos.</p>
+      </div>
+    </div>
+
+    <div class="cut">
+      <img src="https://images.unsplash.com/photo-1512690459411-b9245aed614b" alt="Buzz Cut">
+      <div class="cut-content">
+        <h2>Buzz Cut</h2>
+        <p>Corte curto, prático e masculino.</p>
+      </div>
+    </div>
+
+    <div class="cut">
+      <img src="https://images.unsplash.com/photo-1517832606299-7ae9b720a186" alt="Mid Fade">
+      <div class="cut-content">
+        <h2>Mid Fade</h2>
+        <p>Degradê médio com acabamento premium.</p>
+      </div>
+    </div>
+
+    <div class="cut">
+      <img src="https://images.unsplash.com/photo-1567894340315-735d7c361db0" alt="Freestyle">
+      <div class="cut-content">
+        <h2>Freestyle</h2>
+        <p>Estilo personalizado para quem quer se destacar.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <a href="agendamento.html" class="btn primary back">
+    Agendar meu corte
+  </a>
+
+  <a href="index.html" class="btn secondary back">
+    Voltar para o início
+  </a>
+
+</div>
+
+</body>
+</html>
